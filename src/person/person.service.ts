@@ -1,26 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Person } from './entities/person.entity';
+import { errorResponse } from 'src/helper';
 
 @Injectable()
 export class PersonService {
-  create(createPersonDto: CreatePersonDto) {
-    return 'This action adds a new person';
+
+  constructor(
+    @InjectRepository(Person)
+    private readonly personRepository: Repository<Person>
+  ) { }
+
+
+  async create(createPersonDto: CreatePersonDto) {
+    try {
+      const createPerson = this.personRepository.create(createPersonDto);
+      return await this.personRepository.save(createPerson);
+    } catch (error) {
+      errorResponse.errors(error,'Error Creating Person','No se pudo crear a la Persona');
+    }
   }
 
   findAll() {
-    return `This action returns all person`;
+    try {
+      return this.personRepository.find();
+    } catch (error) {
+      errorResponse.errors(error,'Error Find Person','No se pudo encontrar datos de Personas')
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} person`;
+
+  async findOne(id: string) {
+    try {
+      if (!id) throw new BadRequestException('ingrese el id correctamente');
+      const findPerson = await this.personRepository.findOneBy({id:id});
+      if(!findPerson) throw new BadRequestException('Id No Encontrado');
+      return findPerson;
+    } catch (error) {
+      errorResponse.errors(error,'Error Find Person','No se pudo encontrar datos de la Persona')
+    }
   }
 
-  update(id: number, updatePersonDto: UpdatePersonDto) {
-    return `This action updates a #${id} person`;
+  async update(id: string, updatePersonDto: UpdatePersonDto) {
+    try {
+      await this.findOne(id);
+      return this.personRepository.update(id,updatePersonDto);
+    } catch (error) {
+      errorResponse.errors(error,'Error Update Person','No se pudo Actualizar los datos de la Persona');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} person`;
+  async remove(id: string) {
+    try {
+      await this.findOne(id);
+      const deletePerson= this.personRepository.delete(id);
+      return {message:'Persona eliminada correctamente',deletePerson};
+      
+    } catch (error) {
+      errorResponse.errors(error,'Error delete Person','No se pudo eliminar los datos de la Persona');
+    }
   }
 }

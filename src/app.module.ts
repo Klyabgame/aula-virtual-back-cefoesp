@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonModule } from './person/person.module';
+import { RoleModule } from './role/role.module';
+import { PersonRoleModule } from './person_role/person_role.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { PersonModule } from './person/person.module';
       autoLoadEntities: true,
       synchronize: true
     }),
-    PersonModule
+    PersonModule,
+    RoleModule,
+    PersonRoleModule
   ],
   controllers: [AppController],
   providers: [AppService],
