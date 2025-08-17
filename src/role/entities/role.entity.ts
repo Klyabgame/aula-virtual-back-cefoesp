@@ -8,7 +8,7 @@ export class Role {
     @Column({type:'varchar', length:15, unique:true, nullable:false})
     rol:string
 
-    @Column({type:'varchar', length:35,nullable:false})
+    @Column({type:'varchar', length:50,nullable:false})
     description:string
 
 }
