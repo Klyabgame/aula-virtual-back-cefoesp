@@ -31,4 +31,9 @@ export class PersonController {
   remove(@Param('id') id: string) {
     return this.personService.remove(id);
   }
+
+  @Delete()
+  deletePersonAll() {
+    return this.personService.deletePersonsAll();
+  }
 }

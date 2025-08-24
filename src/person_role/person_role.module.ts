@@ -18,6 +18,7 @@ import { Role } from 'src/role/entities/role.entity';
       Role
     ]),
 
-  ]
+  ],
+  exports:[TypeOrmModule,PersonRoleService]
 })
 export class PersonRoleModule {}

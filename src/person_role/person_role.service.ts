@@ -126,4 +126,16 @@ export class PersonRoleService {
       errorResponse.errors(error, 'Error delete PersonRole', 'No se pudo eliminar a la persona y su rol');
     }
   }
+
+  async deletePersonsRolAll() {
+    try {
+
+      const deletePersonRole= await this.personRoleRepository.deleteAll();
+      if(!deletePersonRole) throw new BadRequestException('ocurrio un error al eliminar person-rol');
+      return deletePersonRole;
+      
+    } catch (error) {
+      errorResponse.errors(error, 'Error delete PersonRoleAll', 'No se pudo eliminar a la personas y su rol');
+    }
+  }
 }

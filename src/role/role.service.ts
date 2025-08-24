@@ -63,4 +63,14 @@ export class RoleService {
       errorResponse.errors(error,'Error delete Role','No se pudo eliminar los datos del Rol');
     }
   }
+
+  async deleteRolAll() {
+    try {
+      const deleteRole= this.roleRepository.deleteAll()
+      return {message:'Rols eliminado correctamente',deleteRole};
+      
+    } catch (error) {
+      errorResponse.errors(error,'Error delete Roles','No se pudo eliminar los datos de los Roles');
+    }
+  }
 }

@@ -63,4 +63,17 @@ export class PersonService {
       errorResponse.errors(error,'Error delete Person','No se pudo eliminar los datos de la Persona');
     }
   }
+
+  async deletePersonsAll() {
+    try {
+      const deletePerson= this.personRepository.deleteAll();
+      
+      return {message:'Personas eliminadas correctamente',deletePerson};
+      
+    } catch (error) {
+      errorResponse.errors(error,'Error delete Person','No se pudo eliminar los datos de la Persona');
+    }
+  }
+
+
 }
