@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonModule } from './person/person.module';
 import { RoleModule } from './role/role.module';
 import { PersonRoleModule } from './person_role/person_role.module';
+import { AuthModule } from './auth/auth.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -22,7 +24,9 @@ import { PersonRoleModule } from './person_role/person_role.module';
     }),
     PersonModule,
     RoleModule,
-    PersonRoleModule
+    PersonRoleModule,
+    AuthModule,
+    SeedModule
   ],
   controllers: [AppController],
   providers: [AppService],
