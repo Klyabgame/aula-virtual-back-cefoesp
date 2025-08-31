@@ -1,11 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { createUserDto } from './dto/create-user.dto';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Auth } from './entities/auth.entity';
+import { Repository } from 'typeorm';
+import { errorResponse } from 'src/helper';
+import { Person } from 'src/person/entities/person.entity';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto, LoginUserDto } from './dto';
 
 
 @Injectable()
 export class AuthService {
-  create(createUserDto: createUserDto) {
-    return 'This action adds a new auth';
+
+  constructor(
+    @InjectRepository(Auth)
+    private readonly userRepository:Repository<Auth>,
+
+    @InjectRepository(Person)
+    private readonly personRepository:Repository<Person>
+  ){}
+
+
+  async createUser(createUserDto: CreateUserDto) {
+
+    try {
+      const personExist= await this.personRepository.findOneBy({id:createUserDto.person_id});
+      if(!personExist) throw new BadRequestException('La persona debe existir');
+
+      const {password}=createUserDto;
+      
+      const createUser= this.userRepository.create({
+        user:createUserDto.user,
+        password:bcrypt.hashSync(password,10),
+        person:personExist
+      });
+      await this.userRepository.save(createUser);
+
+      return createUser
+      
+    } catch (error) {
+      errorResponse.errors(error,'Error Creating User','No se pudo crear al Usuario');
+    }
+
+  }
+
+  async loginUser(loginUserDto:LoginUserDto){
+
+    const { user, password} = loginUserDto;
+
+    const loginUser= await this.userRepository.findOne({
+      where:{ user },
+      select:{user:true, password:true}
+    });
+
+    if(!loginUser) throw new UnauthorizedException('usuario no encontrado - email');
+    if(! bcrypt.compareSync(password, loginUser.password)) throw new UnauthorizedException('usuario no encontrado - password');
+
+    return loginUser;
+
+
   }
 
   /* findAll() {

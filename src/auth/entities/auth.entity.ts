@@ -12,7 +12,7 @@ export class Auth {
     @Column({ type: 'varchar', length: 10, unique: true, nullable: false })
     user: string;
 
-    @Column({ type: 'varchar', length: 50, unique: true, nullable: false })
+    @Column({ type: 'varchar', length: 100, unique: true, nullable: false })
     password: string;
 
     @OneToOne(() => Person, { nullable: false })
