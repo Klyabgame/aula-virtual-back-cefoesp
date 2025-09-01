@@ -6,6 +6,8 @@ import { errorResponse } from 'src/helper';
 import { Person } from 'src/person/entities/person.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, LoginUserDto } from './dto';
+import { JwtPayload } from './interface/jtw-payload.interface';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
@@ -16,7 +18,9 @@ export class AuthService {
     private readonly userRepository:Repository<Auth>,
 
     @InjectRepository(Person)
-    private readonly personRepository:Repository<Person>
+    private readonly personRepository:Repository<Person>,
+
+    private readonly jwtService:JwtService
   ){}
 
 
@@ -35,7 +39,10 @@ export class AuthService {
       });
       await this.userRepository.save(createUser);
 
-      return createUser
+      return {
+      ...createUser,
+      token: this.getJwtToken({user:createUser.user})
+    };
       
     } catch (error) {
       errorResponse.errors(error,'Error Creating User','No se pudo crear al Usuario');
@@ -55,8 +62,20 @@ export class AuthService {
     if(!loginUser) throw new UnauthorizedException('usuario no encontrado - email');
     if(! bcrypt.compareSync(password, loginUser.password)) throw new UnauthorizedException('usuario no encontrado - password');
 
-    return loginUser;
+    return {
+      ...loginUser,
+      token: this.getJwtToken({user:loginUser.user})
+    };
 
+
+  }
+
+  private getJwtToken(payload: JwtPayload){
+
+
+    const token= this.jwtService.sign(payload);
+
+    return token;
 
   }
 

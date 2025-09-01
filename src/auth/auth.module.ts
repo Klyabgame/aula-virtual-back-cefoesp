@@ -7,38 +7,40 @@ import { Person } from 'src/person/entities/person.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwsStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService],
-  imports:[
-      TypeOrmModule.forFeature([
-        Auth,Person
-      ]),
+  providers: [AuthService,JwsStrategy],
+  imports: [
+    ConfigModule,
+    TypeOrmModule.forFeature([
+      Auth, Person
+    ]),
 
-      PassportModule.register({defaultStrategy: 'jwt' }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
 
-      JwtModule.registerAsync({
-        imports:[ConfigModule],
-        inject:[ConfigService],
-        useFactory:(configService:ConfigService)=>{
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
 
-          return {
-            secret: configService.get('JWT_SECRET'),
-            signOptions:{
-              expiresIn:'2h'
-            }
+        return {
+          secret: configService.get('JWT_SECRET'),
+          signOptions: {
+            expiresIn: '2h'
           }
         }
-      })
+      }
+    })
 
-      /* JwtModule.register({
-        secret:process.env.JWT_SECRET,
-        signOptions:{
-          expiresIn:'2h'
-        }
-      }) */
-    ],
-  exports:[TypeOrmModule]
+    /* JwtModule.register({
+      secret:process.env.JWT_SECRET,
+      signOptions:{
+        expiresIn:'2h'
+      }
+    }) */
+  ],
+  exports: [TypeOrmModule, JwsStrategy, PassportModule,JwtModule]
 })
-export class AuthModule {}
+export class AuthModule { }
